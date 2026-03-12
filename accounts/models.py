@@ -15,3 +15,20 @@ class Usuario(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
+
+class PerfilAlumno(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
+    fecha_nacimiento = models.DateField()
+    pais_nacimiento =  models.CharField(max_length=64)
+    nif = models.CharField(max_length=9, unique=True)
+    direccion =  models.CharField(max_length=128)
+    codigo_postal =  models.CharField(max_length=16)
+    municipio =  models.CharField(max_length=64)
+    provincia =  models.CharField(max_length=64)
+    matricula = models.ForeignKey('institutos.OfertaEducativa', on_delete=models.PROTECT)
+
+class PerfilTutor(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
+    tutoria = models.ForeignKey('institutos.OfertaEducativa', on_delete=models.PROTECT)
+    telefono = models.CharField(max_length=16, unique=True)
+

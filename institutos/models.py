@@ -15,9 +15,21 @@ class Instituto(models.Model):
     codigo = models.CharField(max_length=8, unique=True)
     direccion = models.CharField(max_length=256)
     ciclos = models.ManyToManyField(CicloFormativo, through='InstitutoCiclo')
-    usuario = models.OneToOneField('accounts.Usuario', on_delete=models.CASCADE)
+    usuario = models.OneToOneField('accounts.Usuario', on_delete=models.PROTECT)
 
 class InstitutoCiclo(models.Model):
     ciclo = models.ForeignKey(CicloFormativo, on_delete=models.CASCADE)
     instituto = models.ForeignKey(Instituto, on_delete=models.CASCADE)
     modalidad = models.CharField(max_length=1, choices=Modalidad)
+
+class CursoAcademico(models.Model):
+    ano_inicio = models.IntegerField()
+    ano_fin = models.IntegerField()
+
+    def __str__(self) -> str:
+        return f"{self.ano_inicio}-{self.ano_fin}"
+
+class OfertaEducativa(models.Model):
+    instituto_ciclo = models.ForeignKey(InstitutoCiclo, on_delete=models.CASCADE)
+    curso = models.ForeignKey(CursoAcademico, on_delete=models.CASCADE)
+
