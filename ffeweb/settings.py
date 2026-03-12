@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Apps propias del proyecto
     'institutos',
+    'empresas',
     'accounts',
     'ofertas',
     'candidaturas',
