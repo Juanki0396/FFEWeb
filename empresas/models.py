@@ -23,7 +23,3 @@ class RepresentanteLegal(models.Model):
     base_normativa = models.TextField()
     efectuado_por = models.TextField()
 
-class TutorEmpresa(models.Model):
-    usuario = models.OneToOneField('accounts.Usuario', on_delete=models.CASCADE)
-    empresa = models.ForeignKey(Empresa, on_delete=models.PROTECT)
-    telefono = models.CharField(max_length=16)
