@@ -3,9 +3,9 @@ from django.db import models
 class Rol(models.TextChoices):
     ALUMNO = 'alu', 'Alumno'
     TUTOR = 'tut', 'Tutor'
-    EMPRESA = 'emp', 'Empresa'
+    ADMIN_INSTITUTO = 'ins', 'Admin de Instituto'
+    ADMIN_EMPRESA = 'emp', 'Admin de Empresa'
     TUTOR_EMPRESA = 'tue', 'Tutor de Empresa'
-    INSTITUTO = 'ins', 'Instituto'
 
 class Provincia(models.TextChoices):
     ALAVA = 'VI', 'Álava'

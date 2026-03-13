@@ -1,9 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Usuario, PerfilAlumno, PerfilTutor, Invitacion
-from empresas.models import Empresa, TutorEmpresa
-from institutos.models import 
+from .models import Usuario, PerfilAlumno, PerfilTutor, PerfilAdminInstituto,PerfilTutorEmpresa, PerfilAdminEmpresa, Invitacion
 from ffeweb.choices import Rol
 
 # Register your models here.
@@ -18,9 +16,8 @@ class PerfilTutorInline(admin.StackedInline):
 @admin.register(Usuario)
 class UsuarioAdmin(UserAdmin):
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('email', 'password', 'email_verified',)}),
         ('Información personal', {'fields': ('first_name', 'last_name')}),
-        ('FFE', {'fields': ('rol', 'email_verified')}),
         ('Permisos', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Fechas', {'fields': ('last_login', 'date_joined')}),
     )
@@ -28,10 +25,10 @@ class UsuarioAdmin(UserAdmin):
         (None, {'fields': ('email', 'password1', 'password2', 'rol')}),
         ('Información personal', {'fields': ('first_name', 'last_name')}),
     )
-    list_display = ('email', 'first_name', 'last_name', 'rol', 'is_active')
-    list_filter = ('rol', 'is_active')
+    list_display = ('email', 'first_name', 'last_name', 'is_active')
+    list_filter = ( 'is_active',)
     search_fields = ('email', 'first_name', 'last_name')
-    readonly_fields = ('date_joined', 'last_login')
+    readonly_fields = ('date_joined', 'last_login', 'email_verified',)
     ordering = ('email',)
 
     def get_inlines(self, request, obj=None):

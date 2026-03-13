@@ -15,7 +15,6 @@ class Instituto(models.Model):
     codigo = models.CharField(max_length=8, unique=True)
     direccion = models.CharField(max_length=256)
     ciclos = models.ManyToManyField(CicloFormativo, through='InstitutoCiclo')
-    usuario = models.OneToOneField('accounts.Usuario', on_delete=models.PROTECT)
 
 class InstitutoCiclo(models.Model):
     ciclo = models.ForeignKey(CicloFormativo, on_delete=models.CASCADE)

@@ -25,7 +25,6 @@ class UsuarioManager(BaseUserManager):
 class Usuario(AbstractUser):
 
     username = None
-    rol = models.CharField(max_length=3, choices=Rol, blank=True)
     email = models.EmailField(unique=True)
     email_verified = models.BooleanField(default=False)
     objects = UsuarioManager()
@@ -34,7 +33,7 @@ class Usuario(AbstractUser):
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def __str__(self) -> str:
-        return f"{'admin' if self.rol == '' else self.rol} - {self.email}"
+        return f"{self.first_name} {self.last_name}"
 
 class PerfilAlumno(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
@@ -48,7 +47,7 @@ class PerfilAlumno(models.Model):
     matricula = models.ForeignKey('institutos.OfertaEducativa', on_delete=models.PROTECT)
 
     def __str__(self) -> str:
-        return f"ALUMNO:{self.usuario.first_name} {self.usuario.last_name} INS:{self.matricula.instituto_ciclo.instituto.nombre}, FP:{self.matricula.instituto_ciclo.ciclo.nombre}"
+        return f"ALUMNO({self.usuario.first_name} {self.usuario.last_name}, {self.matricula.instituto_ciclo.instituto.nombre}, {self.matricula.instituto_ciclo.ciclo.nombre})"
 
 class PerfilTutor(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
@@ -56,7 +55,31 @@ class PerfilTutor(models.Model):
     telefono = models.CharField(max_length=16)
 
     def __str__(self) -> str:
-        return f"TUTOR:{self.usuario.first_name} {self.usuario.last_name} INS:{self.tutoria.instituto_ciclo.instituto.nombre}, FP:{self.tutoria.instituto_ciclo.ciclo.nombre}"
+        return f"TUTOR({self.usuario.first_name} {self.usuario.last_name}, {self.tutoria.instituto_ciclo.instituto.nombre}, {self.tutoria.instituto_ciclo.ciclo.nombre})"
+
+class PerfilAdminInstituto(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
+    instituto = models.ForeignKey('institutos.Instituto', on_delete=models.PROTECT)
+    telefono = models.CharField(max_length=16)
+
+    def __str__(self) -> str:
+        return f"ADMIN_INSTITUTO({self.usuario.first_name} {self.usuario.last_name}, {self.instituto.nombre})"
+
+class PerfilTutorEmpresa(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
+    empresa = models.ForeignKey('empresas.Empresa', on_delete=models.PROTECT)
+    telefono = models.CharField(max_length=16)
+
+    def __str__(self) -> str:
+        return f"TUTOR_EMPRESA({self.usuario.first_name} {self.usuario.last_name}, {self.empresa.nombre})"
+
+class PerfilAdminEmpresa(models.Model):
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
+    empresa = models.ForeignKey('empresas.Empresa', on_delete=models.PROTECT)
+    telefono = models.CharField(max_length=16)
+
+    def __str__(self) -> str:
+        return f"ADMIN_EMPRESA({self.usuario.first_name} {self.usuario.last_name}, {self.empresa.nombre})"
 
 class Invitacion(models.Model):
     emisor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
@@ -67,4 +90,4 @@ class Invitacion(models.Model):
     fecha_expiracion = models.DateTimeField()
 
     def __str__(self) -> str:
-        return f"Invitacion de {self.emisor.email} al rol {self.rol} hasta {self.fecha_expiracion}"
+        return f"INVITATION({self.emisor.email}, {self.rol}, {self.fecha_expiracion})"
