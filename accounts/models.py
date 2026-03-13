@@ -33,6 +33,9 @@ class Usuario(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
+    def __str__(self) -> str:
+        return f"{'admin' if self.rol == '' else self.rol} - {self.email}"
+
 class PerfilAlumno(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
     fecha_nacimiento = models.DateField()
@@ -44,10 +47,16 @@ class PerfilAlumno(models.Model):
     provincia =  models.CharField(max_length=2, choices=Provincia, default='')
     matricula = models.ForeignKey('institutos.OfertaEducativa', on_delete=models.PROTECT)
 
+    def __str__(self) -> str:
+        return f"ALUMNO:{self.usuario.first_name} {self.usuario.last_name} INS:{self.matricula.instituto_ciclo.instituto.nombre}, FP:{self.matricula.instituto_ciclo.ciclo.nombre}"
+
 class PerfilTutor(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
     tutoria = models.ForeignKey('institutos.OfertaEducativa', on_delete=models.PROTECT)
     telefono = models.CharField(max_length=16)
+
+    def __str__(self) -> str:
+        return f"TUTOR:{self.usuario.first_name} {self.usuario.last_name} INS:{self.tutoria.instituto_ciclo.instituto.nombre}, FP:{self.tutoria.instituto_ciclo.ciclo.nombre}"
 
 class Invitacion(models.Model):
     emisor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
@@ -56,3 +65,6 @@ class Invitacion(models.Model):
     rol = models.CharField(max_length=3, choices=Rol)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_expiracion = models.DateTimeField()
+
+    def __str__(self) -> str:
+        return f"Invitacion de {self.emisor.email} al rol {self.rol} hasta {self.fecha_expiracion}"
