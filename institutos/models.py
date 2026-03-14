@@ -1,5 +1,7 @@
 from django.db import models
 
+from ffeweb.choices import Provincia
+
 # Create your models here.
 class Modalidad(models.TextChoices):
     NORMAL = 'N', 'Normal'
@@ -13,7 +15,10 @@ class CicloFormativo(models.Model):
 class Instituto(models.Model):
     nombre = models.CharField(max_length=128)
     codigo = models.CharField(max_length=8, unique=True)
-    direccion = models.CharField(max_length=256)
+    direccion =  models.CharField(max_length=128, default='')
+    codigo_postal =  models.CharField(max_length=16, default='')
+    municipio =  models.CharField(max_length=64, default='')
+    provincia =  models.CharField(max_length=2, choices=Provincia, default='')
     ciclos = models.ManyToManyField(CicloFormativo, through='InstitutoCiclo')
 
 class InstitutoCiclo(models.Model):
