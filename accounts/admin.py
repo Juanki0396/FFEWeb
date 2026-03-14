@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from .models import Usuario, PerfilAlumno, PerfilTutor, PerfilAdminInstituto,PerfilTutorEmpresa, PerfilAdminEmpresa, Invitacion
-from ffeweb.choices import Rol
 
 # Register your models here.
 class PerfilAlumnoInline(admin.StackedInline):
@@ -10,7 +9,19 @@ class PerfilAlumnoInline(admin.StackedInline):
     can_delete = False
 
 class PerfilTutorInline(admin.StackedInline):
-    model = PerfilAlumno
+    model = PerfilTutor
+    can_delete = False
+
+class PerfilAdminInstitutoInline(admin.StackedInline):
+    model = PerfilAdminInstituto
+    can_delete = False
+
+class PerfilTutorEmpresaInline(admin.StackedInline):
+    model = PerfilTutorEmpresa
+    can_delete = False
+
+class PerfilAdminEmpresaInline(admin.StackedInline):
+    model = PerfilAdminEmpresa
     can_delete = False
 
 @admin.register(Usuario)
@@ -22,7 +33,7 @@ class UsuarioAdmin(UserAdmin):
         ('Fechas', {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
-        (None, {'fields': ('email', 'password1', 'password2', 'rol')}),
+        (None, {'fields': ('email', 'password1', 'password2')}),
         ('Información personal', {'fields': ('first_name', 'last_name')}),
     )
     list_display = ('email', 'first_name', 'last_name', 'is_active')
@@ -32,10 +43,18 @@ class UsuarioAdmin(UserAdmin):
     ordering = ('email',)
 
     def get_inlines(self, request, obj=None):
-        if obj and obj.rol == Rol.ALUMNO:
+        if obj is None:
+            return []
+        if hasattr(obj, 'perfilalumno'):
             return [PerfilAlumnoInline]
-        elif obj and obj.rol == Rol.TUTOR:
+        elif hasattr(obj, 'perfiltutor'):
             return [PerfilTutorInline]
+        elif hasattr(obj, 'perfiladmininstituto'):
+            return [PerfilAdminInstitutoInline]
+        elif hasattr(obj, 'perfiltutorempresa'):
+            return [PerfilTutorEmpresaInline]
+        elif hasattr(obj, 'perfiladminempresa'):
+            return [PerfilAdminEmpresaInline]
         return []
 
 @admin.register(PerfilAlumno)
@@ -61,6 +80,35 @@ class PerfilTutorAdmin(admin.ModelAdmin):
     search_fields = ('usuario__email',)
     ordering = ('usuario__email',)
 
+@admin.register(PerfilAdminInstituto)
+class PerfilAdminInstitutoAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ('Datos', {'fields': ('usuario', 'telefono',)}),
+        ('Instituto', {'fields': ('instituto',)}),
+    )
+    list_display = ('usuario', 'instituto', )
+    search_fields = ('usuario__email',)
+    ordering = ('usuario__email',)
+
+@admin.register(PerfilTutorEmpresa)
+class PerfilTutorEmpresaAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ('Datos', {'fields': ('usuario', 'telefono',)}),
+        ('Empresa', {'fields': ('empresa',)}),
+    )
+    list_display = ('usuario', 'empresa', )
+    search_fields = ('usuario__email',)
+    ordering = ('usuario__email',)
+
+@admin.register(PerfilAdminEmpresa)
+class PerfilAdminEmpresaAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ('Datos', {'fields': ('usuario', 'telefono',)}),
+        ('Empresa', {'fields': ('empresa',)}),
+    )
+    list_display = ('usuario', 'empresa', )
+    search_fields = ('usuario__email',)
+    ordering = ('usuario__email',)
 
 @admin.register(Invitacion)
 class InvitacionAdmin(admin.ModelAdmin):
