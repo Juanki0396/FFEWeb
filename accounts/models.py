@@ -83,11 +83,15 @@ class PerfilAdminEmpresa(models.Model):
 
 class Invitacion(models.Model):
     emisor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    receptor = models.EmailField(blank=True, default='')
     token = models.CharField(max_length=64, unique=True, default=token_urlsafe)
     usado = models.BooleanField(default=False)
     rol = models.CharField(max_length=3, choices=Rol)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_expiracion = models.DateTimeField()
+    instituto = models.ForeignKey('institutos.Instituto', null=True, blank=True, on_delete=models.SET_NULL)                                                                    
+    empresa = models.ForeignKey('empresas.Empresa', null=True, blank=True, on_delete=models.SET_NULL)                                                                    
+    oferta_educativa = models.ForeignKey('institutos.OfertaEducativa', null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self) -> str:
         return f"INVITATION({self.emisor.email}, {self.rol}, {self.fecha_expiracion})"

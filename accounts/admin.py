@@ -1,5 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.urls import reverse
 
 from .models import Usuario, PerfilAlumno, PerfilTutor, PerfilAdminInstituto,PerfilTutorEmpresa, PerfilAdminEmpresa, Invitacion
 
@@ -113,10 +116,34 @@ class PerfilAdminEmpresaAdmin(admin.ModelAdmin):
 @admin.register(Invitacion)
 class InvitacionAdmin(admin.ModelAdmin):
     fieldsets = (
-        ('Datos', {'fields': ('emisor', 'rol', 'token', 'fecha_creacion', 'fecha_expiracion')}),
+        ('Datos', {'fields': ('emisor', 'receptor', 'rol', 'token', 'fecha_creacion', 'fecha_expiracion')}),
+        ('Contexto', {'fields': ('instituto', 'empresa', 'oferta_educativa',)}),
+
     )
-    list_display = ('token', 'emisor', 'usado', 'fecha_expiracion' )
+    list_display = ('token', 'emisor', 'receptor', 'usado', 'fecha_expiracion' )
     list_filter = ('rol', 'usado',)
     search_fields = ('emisor__email', 'token',)
-    readonly_fields = ('token', 'fecha_creacion')
+    readonly_fields = ('emisor', 'token', 'fecha_creacion')
     ordering = ('fecha_creacion',)
+
+    def save_model(self, request, obj, form, change) -> None:
+        if not change:
+            obj.emisor = request.user
+        super().save_model(request, obj, form, change)
+        if not change and obj.receptor:
+            url = reverse('invitacion_registro', args=[obj.token])
+            context = {
+                'url': url,
+                'rol': obj.get_rol_display(),
+                'emisor': obj.emisor,
+            }
+            html = render_to_string('accounts/emails/invitacion.html', context)
+            text = f"Has sido invitado a registrarte en FFEWeb. Accede a: {url}"
+            email = EmailMultiAlternatives(
+                subject='Invitación para registrarte en FFEWeb',
+                body=text,
+                from_email=None,
+                to=[obj.receptor],
+            )
+            email.attach_alternative(html, 'text/html')
+            email.send()

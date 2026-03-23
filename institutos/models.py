@@ -7,10 +7,17 @@ class Modalidad(models.TextChoices):
     NORMAL = 'N', 'Normal'
     INTENSIVO = 'I', 'Intensivo'
     BILINGUE = 'B', 'Bilingüe'
+    
+class Turno(models.TextChoices):
+    DIURNO = 'D', 'Diurno'
+    VESPERTINO = 'V', 'Vespertino'
 
 class CicloFormativo(models.Model):
     nombre = models.CharField(max_length=128)
     codigo = models.CharField(max_length=16, unique=True)
+
+    def __str__(self) -> str:
+        return f"{self.codigo} - {self.nombre}"
 
 class Instituto(models.Model):
     nombre = models.CharField(max_length=128)
@@ -21,10 +28,17 @@ class Instituto(models.Model):
     provincia =  models.CharField(max_length=2, choices=Provincia, default='')
     ciclos = models.ManyToManyField(CicloFormativo, through='InstitutoCiclo')
 
+    def __str__(self) -> str:
+        return str(self.nombre)
+
 class InstitutoCiclo(models.Model):
     ciclo = models.ForeignKey(CicloFormativo, on_delete=models.CASCADE)
     instituto = models.ForeignKey(Instituto, on_delete=models.CASCADE)
     modalidad = models.CharField(max_length=1, choices=Modalidad)
+    turno = models.CharField(max_length=1, choices=Turno, default=Turno.DIURNO)
+
+    def __str__(self) -> str:
+        return f"{self.ciclo.nombre} ({self.get_modalidad_display()}|{self.get_turno_display()}) - {self.instituto.nombre}"
 
 class CursoAcademico(models.Model):
     ano_inicio = models.IntegerField()
@@ -37,3 +51,5 @@ class OfertaEducativa(models.Model):
     instituto_ciclo = models.ForeignKey(InstitutoCiclo, on_delete=models.CASCADE)
     curso = models.ForeignKey(CursoAcademico, on_delete=models.CASCADE)
 
+    def __str__(self) -> str:
+        return f"{self.curso} | {self.instituto_ciclo}"
